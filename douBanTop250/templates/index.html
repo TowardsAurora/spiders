@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <title>Movies Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            cursor: pointer;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("moviesTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for movies..">
+<table id="moviesTable">
+    <thead>
+    <tr>
+        <th onclick="sortTable(0)">Index</th>
+        <th onclick="sortTable(1)">Image</th>
+        <th onclick="sortTable(2)">Link</th>
+        <th onclick="sortTable(3)">Title</th>
+        <th onclick="sortTable(4)">Description</th>
+        <th onclick="sortTable(5)">Rating</th>
+        <th onclick="sortTable(6)">Quote</th>
+    </tr>
+    </thead>
+    <!-- Add table rows dynamically using server-side scripting or JavaScript -->
+    <tbody>
+    {% for movie in movies%}
+    <tr>
+        <td>{{movie[0]}}</td>
+        <td>
+            <a href="{{movie[2]}}">
+                <img src="{{movie[1]}}" style="height: 50px;width: 30px">
+            </a>
+        </td>
+        <td><a href="{{movie[2]}}">{{movie[3]}}</a></td>
+        <td>{{movie[3]}}</td>
+        <td>{{movie[4]}}</td>
+        <td>{{movie[5]}}</td>
+        <td>{{movie[6]}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    <!-- Add more rows as needed -->
+</table>
+
+
+<script>
+    function searchTable() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("moviesTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td");
+            for (j = 0; j < td.length; j++) {
+                txtValue = td[j].textContent || td[j].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    break;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+</body>
+</html>
